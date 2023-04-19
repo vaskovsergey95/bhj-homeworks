@@ -1,40 +1,36 @@
-const quantityCntrl = document.querySelectorAll('.product__quantity-control');
-const product = document.querySelectorAll('.product');
-const cartProducts = document.querySelector('.cart__products');
-const cart = Array.from(document.querySelectorAll('.product__add'));
-const productValue = Array.from(document.querySelectorAll('.product__quantity-value'));
+const quantityBtn = Array.from(document.getElementsByClassName('product__quantity-control'));
+const productAddBtn = Array.from(document.getElementsByClassName('product__add'));
+const cart = document.querySelector('.cart__products');
 
-quantityCntrl.forEach(el => {
-    el.addEventListener('click', () => {
-        if(el.classList.contains('product__quantity-control_dec')) {
-            el.nextElementSibling.innerText <= 1 ? el.nextElementSibling.innerText = 1 : el.nextElementSibling.innerText--;
-        }
-        if(el.classList.contains('product__quantity-control_inc')) {
-            el.previousElementSibling.innerText++;
+quantityBtn.forEach(elem => {
+    elem.addEventListener('click', () => {
+        const p = elem.closest('.product__quantity-controls');
+        const count = p.querySelector('.product__quantity-value');
+
+        if (elem.classList.contains('product__quantity-control_inc')) {
+            count.textContent++;
+        } else if (elem.classList.contains('product__quantity-control_dec') && count.textContent > 1) {
+            count.textContent--;
         }
     })
 })
 
+productAddBtn.forEach(elem => {
+    elem.addEventListener('click', () => {
+        const p = elem.closest('.product');
+        const count = p.querySelector('.product__quantity-value');
+        const srcImage = p.querySelector('.product__image').src;
+        const id = p.getAttribute('data-id');
 
-cart.forEach(el => {
-    el.addEventListener('click', () => {
-        let i = cart.indexOf(el);
-        let value = productValue[i];
-        let dataId = product[i].dataset.id;
-        let image = product[i].children[1].getAttribute("src");
-        let cartProduct = Array.from(cartProducts.children);
-        const products = cartProduct.find((item) => item.dataset.id === dataId);
-        if (!products) {
-            cartProducts.insertAdjacentHTML(
-                "afterBegin",
-                `<div class="cart__product" data-id=${dataId}>
-         <img class="cart__product-image" src=${image}>
-         <div class="cart__product-count">${value}</div></div>`
-            );
+        const productsId = Array.from(cart.children).find(i => i.getAttribute('data-id') === id);
+
+        if (!productsId) {
+            cart.insertAdjacentHTML(
+                'beforeEnd',
+                `<div class="cart__product" data-id="${id}"><img class="cart__product-image" src=${srcImage}><div class="cart__product-count">${count.textContent}</div></div>`);
         } else {
-            let count = products.querySelector('.cart__product-count');
-            let newCount = Number(count.textContent) + Number(value);
-            count.innerText = newCount;
+            const cartProductCount = productsId.querySelector('.cart__product-count');
+            cartProductCount.textContent = +cartProductCount.textContent + +count.textContent;
         }
     })
 })
